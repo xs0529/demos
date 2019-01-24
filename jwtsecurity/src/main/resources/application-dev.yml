@@ -1,0 +1,49 @@
+server:
+  port: 2000
+
+spring:
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    hikari:
+      cachePrepStmts: true
+      prepStmtCacheSize: 250
+      prepStmtCacheSqlLimit: 2048
+    username: root
+    password: root
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://127.0.0.1:3306/mydb?characterEncoding=utf-8&amp;autoReconnect=true
+
+  # redis 配置
+  redis:
+    database: 2              # Redis数据库索引（默认为0）
+    host: 127.0.0.1          # Redis服务器地址
+    password: xs0529         # Redis服务器连接密码（默认为空）
+    port: 6379               # Redis服务器连接端口
+    timeout: 5000            # 连接超时时间（毫秒）
+    jedis:
+      pool:
+        max-active: 8   # 连接池最大连接数（使用负值表示没有限制）
+        max-idle: 8      # 连接池中的最大空闲连接
+        max-wait: -1     # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        min-idle: 0      # 连接池中的最小空闲连接
+mybatis-plus:
+  mapper-locations: classpath*:com/example/demo/jwtsecurity/system/mapper/xml/*.xml
+
+logging:
+  level:
+    com.example.demo.simple_security.system.mapper: DEBUG
+
+
+# token过期时间（小时）
+tokenExpireTime : 1
+# 用户选择保存登录状态对应token过期时间（天）
+saveLoginTime : 7
+# 限制用户登陆错误次数（次）
+loginTimeLimit : 5
+# 错误超过次数后多少分钟后才能继续登录（分钟）
+loginAfterTime : 5

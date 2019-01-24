@@ -1,0 +1,33 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    hikari:
+      cachePrepStmts: true
+      prepStmtCacheSize: 250
+      prepStmtCacheSqlLimit: 2048
+    password: 11qq@@
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://10.8.80.16:3306/oa?characterEncoding=utf-8&amp;autoReconnect=true
+    username: oa_app
+
+  thymeleaf:
+    cache: false
+
+  flyway:
+    enabled: true
+    encoding: UTF-8
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    validate-on-migrate: true
+
+access_token: 5aabab3b97f6306d88feb9f14f06d451
+
+logging:
+  level:
+    com:
+      westcatr:
+        attendance:
+          mapper: debug

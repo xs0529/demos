@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.jwtsecurity.system.mapper.ResourceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.demo.jwtsecurity.system.entity.Resource">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="parent_id" property="parentId" />
+        <result column="type" property="type" />
+        <result column="url" property="url" />
+        <result column="permission" property="permission" />
+        <result column="color" property="color" />
+        <result column="icon" property="icon" />
+        <result column="sort" property="sort" />
+        <result column="verification" property="verification" />
+        <result column="create_date" property="createDate" />
+        <result column="log_is_save" property="logIsSave" />
+    </resultMap>
+    <select id="getResourceByUserId" resultMap="BaseResultMap">
+    SELECT
+	sys_resource.id as id,
+	sys_resource.name as name,
+	sys_resource.parent_id as parent_id,
+	sys_resource.type as type,
+	sys_resource.url as url,
+	sys_resource.permission as permission,
+	sys_resource.color as color,
+	sys_resource.icon as icon,
+	sys_resource.sort as sort,
+	sys_resource.verification as verification,
+	sys_resource.create_date as create_date,
+	sys_resource.log_is_save as log_is_save
+    FROM
+	sys_user
+	LEFT JOIN sys_user_role ON sys_user.id = sys_user_role.uid
+	LEFT JOIN sys_role ON sys_user_role.rid = sys_role.id
+	LEFT JOIN sys_role_resource ON sys_role.id= sys_role_resource.rid
+	LEFT JOIN sys_resource ON sys_role_resource.pid = sys_resource.id
+	WHERE sys_user.id = #{userId}
+    </select>
+</mapper>

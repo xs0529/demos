@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.jwtsecurity.system.mapper.LogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.demo.jwtsecurity.system.entity.Log">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="uid" property="uid" />
+        <result column="ip" property="ip" />
+        <result column="ajax" property="ajax" />
+        <result column="uri" property="uri" />
+        <result column="params" property="params" />
+        <result column="http_method" property="httpMethod" />
+        <result column="class_method" property="classMethod" />
+        <result column="action_name" property="actionName" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+</mapper>
