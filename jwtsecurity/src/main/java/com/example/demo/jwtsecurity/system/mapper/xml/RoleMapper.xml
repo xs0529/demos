@@ -7,5 +7,15 @@
         <id column="id" property="id" />
         <result column="name" property="name" />
     </resultMap>
+    <select id="getRoleByUserId" resultType="com.example.demo.jwtsecurity.system.entity.Role">
+        SELECT
+            r.*
+        FROM
+            sys_user u
+            LEFT JOIN sys_user_role ur ON u.id = ur.uid
+            LEFT JOIN sys_role r ON r.id = ur.rid
+        WHERE
+	    u.id = #{userId}
+    </select>
 
 </mapper>

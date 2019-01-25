@@ -27,7 +27,7 @@ public class MybatisPlusGenerator {
         // 模块名
         String module = "jwtsecurity";
         // 是否多模块项目
-        boolean ISMODULE = false;
+        boolean ISMODULE = true;
         // 包路径
         String packAge = MybatisPlusGenerator.class.getPackage().getName();
         String PACKAGE1 = packAge+".system";

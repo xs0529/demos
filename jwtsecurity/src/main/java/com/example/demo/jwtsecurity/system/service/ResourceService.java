@@ -2,7 +2,13 @@ package com.example.demo.jwtsecurity.system.service;
 
 import com.example.demo.jwtsecurity.system.entity.Resource;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.demo.jwtsecurity.system.entity.Role;
+import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,4 +27,6 @@ public interface ResourceService extends IService<Resource> {
      * @return
      */
     Set<Resource> getResourceByUserId(Integer userId);
+
+    LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> loaderUrlAndRole();
 }

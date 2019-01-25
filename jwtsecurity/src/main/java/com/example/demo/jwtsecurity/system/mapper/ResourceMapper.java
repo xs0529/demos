@@ -1,5 +1,6 @@
 package com.example.demo.jwtsecurity.system.mapper;
 
+import com.example.demo.jwtsecurity.config.security.Url;
 import com.example.demo.jwtsecurity.system.entity.Resource;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -21,4 +22,6 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return
      */
     Set<Resource> getResourceByUserId(Integer userId);
+
+    Set<Url> getAllUrlAndRole();
 }

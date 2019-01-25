@@ -17,6 +17,16 @@
         <result column="create_date" property="createDate" />
         <result column="log_is_save" property="logIsSave" />
     </resultMap>
+
+    <resultMap id="AllUrlAndRoleMap" type="com.example.demo.jwtsecurity.config.security.Url">
+        <id column="url_id" property="id" />
+        <result column="url" property="url" />
+        <collection property="roles" ofType="com.example.demo.jwtsecurity.system.entity.Role" javaType="ArrayList">
+            <id column="id" property="id" />
+            <result column="name" property="name" />
+        </collection>
+    </resultMap>
+
     <select id="getResourceByUserId" resultMap="BaseResultMap">
     SELECT
 	sys_resource.id as id,
@@ -39,4 +49,17 @@
 	LEFT JOIN sys_resource ON sys_role_resource.pid = sys_resource.id
 	WHERE sys_user.id = #{userId}
     </select>
+
+    <select id="getAllUrlAndRole" resultMap="AllUrlAndRoleMap">
+        SELECT
+        a.id AS url_id,
+        a.url,
+        b.id,
+        b.name
+        FROM
+        sys_resource a
+        LEFT JOIN sys_role_resource s ON a.id = s.pid
+        LEFT JOIN sys_role b ON b.id = s.rid
+    </select>
+
 </mapper>
