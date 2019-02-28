@@ -37,6 +37,7 @@ mybatis-plus:
 logging:
   level:
     com.example.demo.simple_security.system.mapper: DEBUG
+    org.springframework.security: DEBUG
 
 
 # token过期时间（小时）
@@ -47,3 +48,17 @@ saveLoginTime : 7
 loginTimeLimit : 5
 # 错误超过次数后多少分钟后才能继续登录（分钟）
 loginAfterTime : 5
+
+github:
+  client:
+    client-id: f4e05bbac2da8bc8c084
+    client-secret: 5a495e35a9161097af2ac7a39b5f99f08e233263
+    accessTokenUri: https://github.com/login/oauth/access_token
+    userAuthorizationUri: https://github.com/login/oauth/authorize
+    clientAuthenticationScheme: form
+    registered-redirect-uri: http://test2.al.xieshuang.xyz/github_login
+    use-current-uri: false
+  resource:
+    userInfoUri: https://api.github.com/user
+  sso:
+    login-path: /github_login

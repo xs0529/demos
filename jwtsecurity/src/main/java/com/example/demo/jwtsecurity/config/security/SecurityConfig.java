@@ -12,6 +12,10 @@ import com.example.demo.jwtsecurity.system.entity.User;
 import com.example.demo.jwtsecurity.system.service.ResourceService;
 import com.example.demo.jwtsecurity.system.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -38,11 +42,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.util.CollectionUtils;
 
+import javax.servlet.Filter;
 import java.util.*;
 
 /**
@@ -56,6 +68,7 @@ import java.util.*;
  */
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableOAuth2Client
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -68,6 +81,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationFailHandler failHandler;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private OAuth2ClientContext oauth2ClientContext;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -79,6 +94,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry urlRegistry = http
                 .authorizeRequests();
+
+        urlRegistry.antMatchers("/oauth/**","/github_login").permitAll();
+
         urlRegistry
                 .and()
                 .formLogin()
@@ -96,8 +114,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 基于token，所以不需要session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 最后添加此filter才能保证所有的请求都需要认证
+                .addFilterBefore(sso(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new MyFilterSecurityInterceptor(),MyFilterSecurityInterceptor.class)
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(),redisUtils));
+                /*.addFilter(new JWTAuthenticationFilter(authenticationManager(),redisUtils))*/;
         http.headers().cacheControl();
 
         MyFilterInvocationSecurityMetadataSource.loaderUrlAndRole(resourceService.loaderUrlAndRole());
@@ -120,7 +139,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 List<SimpleGrantedAuthority> authorities = new ArrayList<>();
                 if (!CollectionUtils.isEmpty(roles)){
                     roles.forEach(role -> {
-                        authorities.add(new SimpleGrantedAuthority("ROLE_"+role.getName()));
+                        if(role!=null){
+                            authorities.add(new SimpleGrantedAuthority("ROLE_"+role.getName()));
+                        }
                     });
                 }
                 return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),user.getIsUsable()==1?true:false,true,true,true,authorities);
@@ -174,4 +195,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         }
     }
 
+    @Bean
+    @ConfigurationProperties("github")
+    public ClientResources github() {
+        return new ClientResources("github");
+    }
+
+    @Autowired
+    GithubPrincipalExtractor githubPrincipalExtractor;
+
+    private Filter sso() {
+        OAuth2ClientAuthenticationProcessingFilter githubFilter = new OAuth2ClientAuthenticationProcessingFilter("/github_login");
+        OAuth2RestTemplate githubTemplate = new OAuth2RestTemplate(github().getClient(), oauth2ClientContext);
+        githubFilter.setRestTemplate(githubTemplate);
+        githubFilter.setAuthenticationSuccessHandler(successHandler);
+        githubFilter.setTokenServices(new UserInfoTokenServices((github().getResource().getUserInfoUri())), github().getClient().getClientId()));
+        return githubFilter;
+    }
+
+    @Bean
+    public FilterRegistrationBean oauth2ClientFilterRegistration(
+            OAuth2ClientContextFilter filter) {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(filter);
+        registration.setOrder(-100);
+        return registration;
+    }
 }
